@@ -19,39 +19,34 @@ grid = [ [0]*GRID_SIZE for i in range (GRID_SIZE) ]
 
 overlapping = set()
 
+def overlaps ( x, y):
+    grid [ x ] [ y ] += 1
+
+    if grid [ x ] [ y ] > 1:
+        overlapping . add ( (x,y) )
+
 for line in lines:
     a, b = line . split ( '->' )
     x1, y1 = [ int ( c ) for c in a . split ( ',' ) ]
     x2, y2 = [ int ( c ) for c in b . split ( ',' ) ]
 
+    left_point, right_point = ((x1,y1),(x2,y2)) if x1 < x2 else ((x2,y2),(x1,y1))
+
     if x1 == x2 or y1 == y2:
-        if x1 == x2:
-            start, end  = min ( [y1, y2] ), max ( [y1,y2] )
-            for i in range ( end - start + 1 ):
+        axis = [x1,x2] if y1 == y2 else [y1,y2]
+        start, end = min ( axis), max ( axis )
 
-                grid [ x1 ] [ start + i ] += 1
-                
-                if grid [ x1 ] [ start + i ] > 1:
-                    overlapping.add ( (x1, start + i))
-
-        if y1 == y2:
-            start, end  = min ( [x1, x2] ), max ( [x1,x2] )
-            for i in range ( end - start + 1 ):
-                
-                grid [ start + i ] [ y1 ] += 1
-
-                if grid [ start + i ] [y1] > 1:
-                    overlapping.add( (start+i, y1) )
-
+        for i in range (end - start + 1 ):
+            if x1 == x2:
+                overlaps ( x1, start + i )
+            else:
+                overlaps ( start + i, y1 )
 
     else:
-        left_point, right_point = ((x1,y1),(x2,y2)) if x1 < x2 else ((x2,y2),(x1,y1))
         direction = 1 if left_point[1] < right_point[1] else -1
 
         for i in range ( right_point[0] - left_point[0] + 1):
-            grid [ left_point[0] + i ] [ left_point[1] + direction*i ] += 1
-            if grid [ left_point[0] + i ] [ left_point[1] + direction*i ] > 1:
-                overlapping.add ( (left_point[0] + i,left_point[1] + direction*i))
+            overlaps ( left_point[0] + i, left_point[1] + direction*i )
 
 
 print ( f"overlapping points: {len ( overlapping )}")
