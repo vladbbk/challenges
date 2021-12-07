@@ -15,21 +15,12 @@ with open ( sys.argv[1], "r") as f:
     lines = [ line . strip () for line in f.readlines() ]
 
 # ------------------------------------------------------------------------
-from functools import lru_cache
 crab_positions = [ int(c) for c in lines[0] . split (',') ]
 fuel_positions = [0]*max(crab_positions)
 
-@lru_cache(maxsize=None)
+# sum of N consecutive natural numbers starting from 1 -> no need for cache
 def dist ( n ):
-    if n < 2:
-        return n
-
-    return n + dist ( n - 1 )
-
-# without pre-filling, maximum recursion depth exceeded
-MAX_DEPTH = 2000
-for i in range ( MAX_DEPTH ):
-    dist ( i )
+    return ( n*(n+1) ) // 2
 
 # we can keep the same algorith, but use dist func instead
 min = math.inf
