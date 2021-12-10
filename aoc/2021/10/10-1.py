@@ -24,28 +24,28 @@ scoring = {
     '>': 4
 }
 
-def get_line_score ( string ) -> int:
+def get_string_score ( string ) -> int:
     score = 0
     expected = []
 
     for char in string:
         if char in openings:
             expected . append ( closings [ openings.index (char) ] )
+            continue
 
-        if char in closings:
-            # it must match the last character in expected
-            if not expected or char != expected[-1]:
-                return score
+        # it must match the last character in expected
+        if not expected or char != expected[-1]:
+            return score
 
-            # else remove from the expected
-            expected . pop ()
+        # else remove from the expected
+        expected . pop ()
 
     for char in reversed ( expected ):
         score = score*5 + scoring [ char ]
 
     return score
 
-scores = [ get_line_score ( line ) for line in lines ]
+scores = [ get_string_score ( line ) for line in lines ]
 scores = sorted ( filter ( lambda n: n != 0, scores ) )
 
 print ( f"middle of incomplete: {scores [ len ( scores ) // 2]}")

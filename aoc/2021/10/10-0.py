@@ -26,18 +26,18 @@ scoring = {
 
 def get_string_score ( string ) -> int:
     expected = []
-    
+
     for char in string:
         if char in openings:
             expected . append ( closings [ openings.index (char) ] )
+            continue
 
-        if char in closings:
-            # it must match the last character in expected
-            if not expected or char != expected[-1]:
-                return scoring [ char ]
+        # it must match the last character in expected
+        if not expected or char != expected[-1]:
+            return scoring [ char ]
 
-            # else remove from the expected
-            expected . pop ()
+        # else remove from the expected
+        expected . pop ()
 
     return 0
 
