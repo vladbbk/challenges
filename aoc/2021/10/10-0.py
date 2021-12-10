@@ -14,8 +14,8 @@ with open ( sys.argv[1], "r") as f:
     lines = [ line . strip () for line in f.readlines() ]
 
 # ------------------------------------------------------------------------
-opens  = [ '(', '[', '{', '<' ]
-closes = [ ')', ']', '}', '>' ]
+openings = [ '(', '[', '{', '<' ]
+closings = [ ')', ']', '}', '>' ]
 
 scoring = {
     ')': 3,
@@ -24,23 +24,23 @@ scoring = {
     '>': 25137
 }
 
-def check ( string ) -> int:
-    queue = []
-    for c in string:
-        if c in opens:
-            queue . append ( closes [ opens.index (c) ] )
+def get_string_score ( string ) -> int:
+    expected = []
+    
+    for char in string:
+        if char in openings:
+            expected . append ( closings [ openings.index (char) ] )
 
-        if c in closes:
-            # it must match the last character in queue
-            if not queue or c != queue [ len ( queue ) - 1 ]:
-                return scoring [ c ]
+        if char in closings:
+            # it must match the last character in expected
+            if not expected or char != expected[-1]:
+                return scoring [ char ]
 
-            # else remove from the queue
-            queue . pop ()
+            # else remove from the expected
+            expected . pop ()
 
-    # print ( f"OK:        {string}")
     return 0
 
-score = sum ( [ check ( line ) for line in lines ])
+score = sum ( [ get_string_score ( line ) for line in lines ])
 
 print ( f"achieved score: {score}")

@@ -14,8 +14,8 @@ with open ( sys.argv[1], "r") as f:
     lines = [ line . strip () for line in f.readlines() ]
 
 # ------------------------------------------------------------------------
-opens  = [ '(', '[', '{', '<' ]
-closes = [ ')', ']', '}', '>' ]
+openings = [ '(', '[', '{', '<' ]
+closings = [ ')', ']', '}', '>' ]
 
 scoring = {
     ')': 1,
@@ -24,32 +24,28 @@ scoring = {
     '>': 4
 }
 
-def incomplete ( string ):
-    queue = []
-    for c in string:
-        if c in opens:
-            queue . append ( closes [ opens.index (c) ] )
+def get_line_score ( string ) -> int:
+    score = 0
+    expected = []
 
-        if c in closes:
-            # it must match the last character in queue
-            if not queue or c != queue [ len ( queue ) - 1 ]:
-                return None
+    for char in string:
+        if char in openings:
+            expected . append ( closings [ openings.index (char) ] )
 
-            # else remove from the queue
-            queue . pop ()
+        if char in closings:
+            # it must match the last character in expected
+            if not expected or char != expected[-1]:
+                return score
 
-    # -> incomplete
-    if queue:
-        score = 0
-        queue . reverse ()
-        for c in queue:
-            score *= 5
-            score += scoring [ c ]
-        
-        return score
-    return None
+            # else remove from the expected
+            expected . pop ()
 
-scores = [ incomplete ( line ) for line in lines ]
-scores = sorted ( filter ( None, scores ) )
+    for char in reversed ( expected ):
+        score = score*5 + scoring [ char ]
+
+    return score
+
+scores = [ get_line_score ( line ) for line in lines ]
+scores = sorted ( filter ( lambda n: n != 0, scores ) )
 
 print ( f"middle of incomplete: {scores [ len ( scores ) // 2]}")
