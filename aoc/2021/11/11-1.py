@@ -19,9 +19,9 @@ import copy
 grid = { (x,y): int (lines[x][y]) for x in range ( len ( lines ) )  \
                                   for y in range ( len ( lines[x] ) ) }
 steps = 0
-flashes = 0
 
-def get_adjacent_coords ( x, y ):
+def get_adjacent_coords ( tuple ):
+    x, y = tuple
     candidates = [
         ( x - 1, y ),
         ( x + 1, y ),
@@ -33,52 +33,38 @@ def get_adjacent_coords ( x, y ):
         ( x - 1, y + 1 )
     ]
 
-    return list ( filter ( lambda t: 0 <= t[0] < 10 and 0 <= t[1] < 10, candidates ) )
+    return filter ( lambda t: 0 <= t[0] < 10 and 0 <= t[1] < 10, candidates )
 
 while True:
     flashed = set ()
-    queue = { (x, y): 1 for x, y in grid . keys () }
-    iteration = 0
-
+    increases = { octopus: 1 for octopus in grid . keys () }
+    
     all_increased = False
-
     while not all_increased:
         all_increased = True
 
-        for octopus in queue:
-            increases = queue [ octopus ]
+        for octopus in increases:
+            if increases [ octopus ] != 0 and octopus not in flashed:
+                if increases [ octopus ] + grid [ octopus ] > 9:
+                    # 'flash' octopus
+                    flashed . add ( octopus )
+                    grid [ octopus ] = 0
 
-            if increases != 0:
-                #print ( f"increasing {octopus} from: [{grid[octopus]}], with [{queue[octopus]}]")
-
-                if octopus not in flashed:
-                    if increases + grid [ octopus ] > 9:
-                        flashed . add ( octopus )
-                        grid [ octopus ] = 0
-                        for adj in get_adjacent_coords ( octopus[0], octopus[1] ):
-                            
-                            # the number of increases in queue should be increased
-                            # only if the adjacent octopus did not flash
-
-                            # if the adjacent octopus has already been processed,
-                            # it should be processed once again, cuz it didn't flash
-                            if adj not in flashed:
-                                queue [ adj ] += 1
-                                all_increased = False
-                                #print ( f"  - adj: {adj} should be increased: {queue[adj]}")
-                    else:
-                        grid [ octopus ] += increases
-                        queue [ octopus ] = 0
-            
-        iteration += 1
+                    # for every neighbor (which hasn't already flashed)
+                    # increase the energy level addition and reset the loop
+                    for neighbor in get_adjacent_coords ( octopus ):
+                        if neighbor not in flashed:
+                            increases [ neighbor ] += 1
+                            all_increased = False
+                else:
+                    grid [ octopus ] += increases [ octopus ]
+                    increases [ octopus ] = 0
 
     steps += 1
-    flashed_in_step = len ( flashed )
-    flashes += steps
 
-    if flashed_in_step == 100:
+    if len ( flashed ) == 100:
         break
     
 
 
-print ( f"100 octopuses flashed after steps {steps}")
+print ( f"all octopuses flash at once after steps {steps}")
