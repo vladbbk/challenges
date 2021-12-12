@@ -33,11 +33,7 @@ def dfs_rec ( cave, visited ):
     if cave.islower() and cave in visited:
         return 0
 
-    
-    copy = set ( visited )
-    copy . add ( cave )
-
-    return sum ( [ dfs_rec ( c, copy ) for c in graph [ cave ] ] )
+    return sum ( [ dfs_rec ( c, visited.union ( {cave}) ) for c in graph [ cave ] ] )
 
 paths = dfs_rec ( "start", set () )
 print ( f"#paths: {paths}")

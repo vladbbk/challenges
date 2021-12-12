@@ -15,7 +15,6 @@ else:
 
 lines = [ line . strip () for line in lines ]
 # ------------------------------------------------------------------------
-from copy import deepcopy
 from collections import defaultdict
 graph = defaultdict ( list )
 
@@ -30,20 +29,14 @@ for line in lines:
 def dfs_rec ( cave, visited, small_cave ):
     if cave == "end":
         return 1
-
-    copy_small_cave = small_cave
         
     if cave.islower() and cave in visited:
         if small_cave or cave == "start":
             return 0
 
-        copy_small_cave = cave
+        small_cave = cave
 
-    
-    copy = deepcopy ( visited )
-    copy . add ( cave )
-
-    return sum ( [ dfs_rec ( c, copy, copy_small_cave ) for c in graph [ cave ] ] )
+    return sum ( [ dfs_rec ( c, visited.union ( {cave} ), small_cave ) for c in graph [ cave ] ] )
 
 paths = dfs_rec ( "start", set (), None )
 print ( f"#paths: {paths}")
