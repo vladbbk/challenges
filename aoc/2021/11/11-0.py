@@ -15,24 +15,14 @@ else:
 
 lines = [ line . strip () for line in lines ]
 # ------------------------------------------------------------------------
-import copy
+import itertools
 grid = { (x,y): int (lines[x][y]) for x in range ( len ( lines ) )  \
                                   for y in range ( len ( lines[x] ) ) }
 steps = 100
 flashes = 0
 
 def get_adjacent_coords ( tuple ):
-    x, y = tuple
-    candidates = [
-        ( x - 1, y ),
-        ( x + 1, y ),
-        ( x, y - 1 ),
-        ( x, y + 1 ),
-        ( x + 1, y + 1 ),
-        ( x - 1, y - 1 ),
-        ( x + 1, y - 1 ),
-        ( x - 1, y + 1 )
-    ]
+    candidates = [ (tuple[0] + i, tuple[1] + j) for (i, j) in itertools.product ( [-1, 0, 1], repeat=2 )]
 
     return filter ( lambda t: 0 <= t[0] < 10 and 0 <= t[1] < 10, candidates )
 
