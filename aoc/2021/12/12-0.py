@@ -15,18 +15,12 @@ else:
 
 lines = [ line . strip () for line in lines ]
 # ------------------------------------------------------------------------
-from copy import deepcopy
-graph = {}
+from collections import defaultdict
+graph = defaultdict ( list )
 
 # create the graph
 for line in lines:
     _from, _to = line . split ( '-' )
-    
-    if _from not in graph:
-        graph [ _from ] = []
-
-    if _to not in graph:
-        graph [ _to ] = []
 
     graph [ _from ] . append ( _to )
     graph [ _to ] . append ( _from )
