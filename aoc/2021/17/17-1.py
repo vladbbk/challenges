@@ -23,21 +23,11 @@ x, y = lines[0][13:] . split ( ", " )
 x_min, x_max = [ int ( coord ) for coord  in x[2:] . split ( ".." ) ]
 y_min, y_max = [ int ( coord ) for coord  in y[2:] . split ( ".." ) ]
 
-# print ( f"target space: <x> in [{x_min}, {x_max}], <y> in [{y_min}, {y_max}]")
-
-total_hits = 0
-
 def point_in_target ( point ):
-    if x_min <= point[0] <= x_max and y_min <= point[1] <= y_max:
-        return True
-
-    return False
+    return x_min <= point[0] <= x_max and y_min <= point[1] <= y_max
 
 def overshot_target ( point ):
-    if point[0] > x_max or point[1] < y_min:
-        return True
-
-    return False
+    return point[0] > x_max or point[1] < y_min
 
 def next_point ( point, velocity_vector ):
     # generate the new point
@@ -60,20 +50,16 @@ def try_vector ( vector ):
     velocity = vector
     point = (0, 0) 
 
-    while True:
+    while not overshot_target ( point ):
         point, velocity = next_point ( point, velocity )
-        # print ( f"  - generated new point: {point}")
-        if overshot_target ( point ):
-            # print ( f" - vector {vector} overshot target, not counting ..." )
-            return 0
-
+        
         if point_in_target ( point ):
-            # print ( f" - vector {vector} hit target! finding maximum: {stops_in(vector[1])}")
             return 1
 
+    return 0
 
 possible_x = [ x for x in range ( x_max + 1 ) ]
-possible_y = list (range ( y_min - 1, (-1)*y_min  ))
+possible_y = range ( y_min - 1, (-1)*y_min  )
 
 total_hits = sum ( try_vector ( vector ) for vector in product ( possible_x, possible_y ) )
 

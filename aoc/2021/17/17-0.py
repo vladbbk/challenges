@@ -23,21 +23,11 @@ x, y = lines[0][13:] . split ( ", " )
 x_min, x_max = [ int ( coord ) for coord  in x[2:] . split ( ".." ) ]
 y_min, y_max = [ int ( coord ) for coord  in y[2:] . split ( ".." ) ]
 
-# print ( f"target space: <x> in [{x_min}, {x_max}], <y> in [{y_min}, {y_max}]")
-
-absolute_x_max = 0
-
 def point_in_target ( point ):
-    if x_min <= point[0] <= x_max and y_min <= point[1] <= y_max:
-        return True
-
-    return False
+    return  x_min <= point[0] <= x_max and y_min <= point[1] <= y_max
 
 def overshot_target ( point ):
-    if point[0] > x_max or point[1] < y_min:
-        return True
-
-    return False
+    return point[0] > x_max or point[1] < y_min
 
 def next_point ( point, velocity_vector ):
     # generate the new point
@@ -56,20 +46,16 @@ def next_point ( point, velocity_vector ):
     return new_point, (x_acceleration, y_acceleration)
 
 def try_vector ( vector ):
-    global absolute_x_max
+    global absolute_y_max
     velocity = vector
     point = (0, 0) 
 
-    while True:
+    while not overshot_target ( point ):
         point, velocity = next_point ( point, velocity )
-        # print ( f"  - generated new point: {point}")
-        if overshot_target ( point ):
-            # print ( f" - vector {vector} overshot target, not counting ..." )
-            return 0
 
         if point_in_target ( point ):
-            # print ( f" - vector {vector} hit target! finding maximum: {stops_in(vector[1])}")
-            return stops_in(vector[1])
+            absolute_y_max = max ( absolute_y_max, stops_in(vector[1]))
+            break
 
 @functools.cache
 def stops_in ( x ):
@@ -81,8 +67,9 @@ def stops_in ( x ):
 possible_x = [ x for x in range ( x_min ) if x_min <= stops_in ( x ) <= x_max ]
 possible_y = range ( (-1)*y_max, (-1)*y_min )
 
-cartesian = product ( possible_x, possible_y )
+absolute_y_max = 0
 
-maximum_y = max ( [ try_vector ( vector ) for vector in cartesian ] )
+for vector in product ( possible_x, possible_y ):
+    try_vector ( vector )
 
-print ( f"The highest position over <y> axis: {maximum_y}")
+print ( f"The highest position over <y> axis: {absolute_y_max}")
